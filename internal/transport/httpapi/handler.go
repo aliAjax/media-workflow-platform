@@ -130,7 +130,9 @@ func writeError(w http.ResponseWriter, e error) {
 	if errors.Is(e, domain.ErrInvalidInput) {
 		s = 400
 	}
-	if errors.Is(e, domain.ErrNotFound) {
+	if _, ok := e.(domain.PublicError); ok {
+		s = 500
+	} else if errors.Is(e, domain.ErrNotFound) {
 		s = 404
 	}
 	if errors.Is(e, domain.ErrConflict) {

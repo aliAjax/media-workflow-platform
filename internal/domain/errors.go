@@ -24,9 +24,9 @@ func (e PublicError) Error() string {
 	}
 	return fmt.Sprintf("%s: %s", e.Code, e.Message)
 }
-func (e PublicError) Unwrap() error { return e.Cause }
+func (e PublicError) Unwrap() error { return nil }
 func NewInvalid(message string, cause error) error {
-	return PublicError{Code: CodeInvalidInput, Message: message, Cause: cause}
+	return PublicError{Code: CodeInvalidInput, Message: message}
 }
 func NewNotFound(message string) error { return PublicError{Code: CodeNotFound, Message: message} }
 func NewConflict(message string) error { return PublicError{Code: CodeConflict, Message: message} }
