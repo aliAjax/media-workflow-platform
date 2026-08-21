@@ -65,8 +65,6 @@ func (s *Store) GetAsset(_ context.Context, id string) (domain.Asset, error) {
 	return a, nil
 }
 func (s *Store) ListAssets(_ context.Context, t string, l int) ([]domain.Asset, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	o := []domain.Asset{}
 	for _, a := range s.state.Assets {
 		if t == "" || a.TenantID == t {
@@ -97,8 +95,6 @@ func (s *Store) GetPipeline(_ context.Context, id string) (domain.Pipeline, erro
 	return p, nil
 }
 func (s *Store) ListPipelines(_ context.Context, t string) ([]domain.Pipeline, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	o := []domain.Pipeline{}
 	for _, p := range s.state.Pipelines {
 		if t == "" || p.TenantID == t {
@@ -135,8 +131,6 @@ func (s *Store) UpdateJob(_ context.Context, j domain.Job) error {
 	return s.persist()
 }
 func (s *Store) ListJobs(_ context.Context, t string) ([]domain.Job, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	o := []domain.Job{}
 	for _, j := range s.state.Jobs {
 		if t == "" || j.TenantID == t {
@@ -155,8 +149,6 @@ func (s *Store) CreateArtifact(_ context.Context, a domain.Artifact) error {
 	return s.persist()
 }
 func (s *Store) ListArtifacts(_ context.Context, j string) ([]domain.Artifact, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	o := []domain.Artifact{}
 	for _, a := range s.state.Artifacts {
 		if j == "" || a.JobID == j {

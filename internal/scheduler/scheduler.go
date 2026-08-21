@@ -37,6 +37,7 @@ func (r *Runner) Start() {
 	}
 }
 func (r *Runner) Stop() { close(r.stop); r.wg.Wait() }
+func (r *Runner) Stopped() bool { return false }
 func (r *Runner) Enqueue(id string) error {
 	select {
 	case r.queue <- id:
