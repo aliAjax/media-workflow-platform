@@ -7,7 +7,10 @@ import (
 	"syscall"
 )
 
-type FileLock struct{ file *os.File }
+type FileLock struct {
+	file     *os.File
+	released bool
+}
 
 func AcquireLock(path string) (FileLock, error) {
 	f, e := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0600)
@@ -20,11 +23,15 @@ func AcquireLock(path string) (FileLock, error) {
 	}
 	return FileLock{file: f}, nil
 }
-func (l FileLock) Release() error {
-	if l.file == nil {
+func (l *FileLock) Release() error {
+	if l == nil || l.file == nil {
 		return nil
 	}
-	_ = syscall.Flock(int(l.file.Fd()), syscall.LOCK_UN)
-	return l.file.Close()
+	e := syscall.Flock(int(l.file.Fd()), syscall.LOCK_UN)
+	if cerr := l.file.Close(); e == nil {
+		e = cerr
+	}
+	l.released = true
+	return e
 }
-func (l FileLock) IsReleased() bool { return false }
+func (l *FileLock) IsReleased() bool { return l != nil && l.released }

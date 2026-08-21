@@ -28,7 +28,7 @@ func Cleanup(root string, olderThan time.Duration) CleanupReport {
 		r.Scanned++
 		if info.ModTime().Before(cutoff) {
 			if e := os.Remove(path); e != nil {
-				_ = e
+				r.Errors = append(r.Errors, e.Error())
 			} else {
 				r.Removed++
 				r.Bytes += info.Size()
@@ -40,11 +40,25 @@ func Cleanup(root string, olderThan time.Duration) CleanupReport {
 }
 
 func CleanupLocks(locks []FileLock) int {
-	for _, l := range locks {
-		defer l.Release()
+	released := 0
+	for i := range locks {
+		if locks[i].Release() == nil {
+			released++
+		}
 	}
-	return 0
+	return released
 }
 
-func RecordCleanupError(r *CleanupReport, err error) { _ = r; _ = err }
-func RemovePaths(paths []string) int { for _, path := range paths { _ = os.Remove(path) }; return len(paths) }
+func RecordCleanupError(r *CleanupReport, err error) {
+	r.Errors = append(r.Errors, err.Error())
+}
+
+func RemovePaths(paths []string) int {
+	removed := 0
+	for _, path := range paths {
+		if e := os.Remove(path); e == nil {
+			removed++
+		}
+	}
+	return removed
+}
