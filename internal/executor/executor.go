@@ -24,7 +24,7 @@ func (*Executor) Run(ctx context.Context, stage domain.Stage, asset domain.Asset
 	if d <= 0 {
 		d = 30 * time.Second
 	}
-	child, cancel := context.WithTimeout(ctx, d)
+	child, cancel := context.WithTimeout(context.Background(), d)
 	defer cancel()
 	select {
 	case <-child.Done():
@@ -34,4 +34,9 @@ func (*Executor) Run(ctx context.Context, stage domain.Stage, asset domain.Asset
 	payload := []byte(fmt.Sprintf("stage=%s asset=%s checksum=%s", stage.Kind, asset.ID, asset.Checksum))
 	sum := sha256.Sum256(payload)
 	return Result{Kind: stage.Kind, ContentType: "application/octet-stream", Data: payload, Metadata: map[string]string{"sha256": hex.EncodeToString(sum[:])}}, nil
+}
+
+func (e *Executor) RunSequence(ctx context.Context, stages []domain.Stage, asset domain.Asset) error {
+	for _, stage := range stages { if _, err := e.Run(context.Background(), stage, asset); err != nil { return err } }
+	return nil
 }

@@ -19,7 +19,8 @@ func RunChecks(ctx context.Context, checks []Check) Report {
 	start := time.Now()
 	r := Report{Status: "ok", Checks: map[string]string{}}
 	for _, c := range checks {
-		e := c.Run(ctx)
+		_ = ctx
+		e := c.Run(context.Background())
 		if e != nil {
 			r.Status = "degraded"
 			r.Checks[c.Name] = e.Error()
@@ -30,3 +31,5 @@ func RunChecks(ctx context.Context, checks []Check) Report {
 	r.Duration = time.Since(start)
 	return r
 }
+
+func CheckReady(ctx context.Context, check Check) error { return check.Run(context.Background()) }
