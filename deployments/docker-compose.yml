@@ -1,0 +1,7 @@
+services:
+  media-api:
+    build: ..
+    ports: ["8084:8084"]
+    environment: ["MEDIA_ADDR=:8084", "MEDIA_STATE=/data/state.json", "MEDIA_BLOBS=/data/blobs"]
+    volumes: ["media-data:/data"]
+volumes: {media-data: {}}

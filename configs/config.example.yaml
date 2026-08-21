@@ -1,0 +1,4 @@
+address: ":8084"
+state_file: "./data/state.json"
+blob_root: "./data/blobs"
+worker_count: 2

@@ -1,0 +1,7 @@
+openapi: 3.1.0
+info: {title: Media Workflow API, version: 1.0.0}
+paths:
+  /healthz: {get: {responses: {"200": {description: healthy}}}}
+  /api/v1/assets: {get: {responses: {"200": {description: list}}}, post: {responses: {"201": {description: created}}}}
+  /api/v1/pipelines: {get: {responses: {"200": {description: list}}}, post: {responses: {"201": {description: created}}}}
+  /api/v1/jobs: {get: {responses: {"200": {description: list}}}, post: {responses: {"202": {description: accepted}}}}

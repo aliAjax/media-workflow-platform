@@ -1,0 +1,11 @@
+syntax = "proto3";
+package media.v1;
+option go_package = "example.com/media-workflow/api/proto;mediav1";
+service Worker { rpc Register(RegisterRequest) returns (RegisterResponse); rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse); }
+service Scheduler { rpc Acquire(AcquireRequest) returns (AcquireResponse); }
+message RegisterRequest { string worker_id = 1; repeated string capabilities = 2; }
+message RegisterResponse { bool accepted = 1; }
+message HeartbeatRequest { string worker_id = 1; }
+message HeartbeatResponse { bool accepted = 1; }
+message AcquireRequest { string worker_id = 1; }
+message AcquireResponse { string job_id = 1; }

@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: media-api}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: media-api}}
+  template:
+    metadata: {labels: {app: media-api}}
+    spec:
+      containers:
+        - name: api
+          image: media-workflow:latest
+          ports: [{containerPort: 8084}]
+          readinessProbe: {httpGet: {path: /readyz, port: 8084}}
+          livenessProbe: {httpGet: {path: /healthz, port: 8084}}
