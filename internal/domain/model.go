@@ -74,6 +74,11 @@ type Job struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
+
+func CanComplete(state JobState) bool {
+	return state == JobQueued
+}
+
 type Artifact struct {
 	ID          string    `json:"id"`
 	JobID       string    `json:"job_id"`
@@ -151,7 +156,11 @@ func TopologicalOrder(stages []Stage) ([]Stage, error) {
 	return out, nil
 }
 func (j Job) Transition(next JobState) error {
-	allowed := map[JobState][]JobState{JobQueued: {JobRunning, JobCanceled}, JobRunning: {JobPaused, JobSucceeded, JobFailed, JobCanceled}, JobPaused: {JobRunning, JobCanceled}, JobFailed: {JobQueued}}
+	allowed := map[JobState][]JobState{
+		JobQueued:  {JobRunning, JobCanceled},
+		JobRunning: {JobPaused, JobSucceeded, JobFailed, JobCanceled},
+		JobPaused:  {JobRunning, JobCanceled},
+	}
 	for _, v := range allowed[j.State] {
 		if v == next {
 			return nil
