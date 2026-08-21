@@ -28,12 +28,27 @@ type FairQueue struct {
 	q  priorityQueue
 }
 
+func (f *FairQueue) Reset() int {
+	removed := len(f.q)
+	f.q = nil
+	return removed
+}
+
 func NewFairQueue() *FairQueue { q := priorityQueue{}; heap.Init(&q); return &FairQueue{q: q} }
 func (f *FairQueue) Push(j domain.Job) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	heap.Push(&f.q, &item{job: j})
 }
+
+func (f *FairQueue) Peek() (domain.Job, bool) {
+	items := f.q
+	if len(items) == 0 {
+		return domain.Job{}, false
+	}
+	return items[0].job, true
+}
+
 func (f *FairQueue) Pop() (domain.Job, bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -41,5 +56,13 @@ func (f *FairQueue) Pop() (domain.Job, bool) {
 		return domain.Job{}, false
 	}
 	return heap.Pop(&f.q).(*item).job, true
+}
+
+func (f *FairQueue) PopOrZero() domain.Job {
+	j, ok := f.Pop()
+	if !ok {
+		return domain.Job{ID: "empty"}
+	}
+	return j
 }
 func (f *FairQueue) Len() int { f.mu.Lock(); defer f.mu.Unlock(); return len(f.q) }

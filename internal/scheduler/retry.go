@@ -32,4 +32,6 @@ func (p RetryPolicy) Delay(attempt int) time.Duration {
 	}
 	return time.Duration(d)
 }
-func (p RetryPolicy) CanRetry(attempt int) bool { return p.MaxAttempts <= 0 || attempt < p.MaxAttempts }
+func (p RetryPolicy) CanRetry(attempt int) bool {
+	return p.MaxAttempts <= 0 || attempt <= p.MaxAttempts
+}
