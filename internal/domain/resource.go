@@ -61,4 +61,10 @@ func (c ResourceClaim) HasLabel(key, value string) bool {
 	return c.Labels != nil && c.Labels[key] == value
 }
 
-func (c ResourceClaim) CopyLabels() map[string]string { return c.Labels }
+func (c ResourceClaim) CopyLabels() map[string]string {
+	out := make(map[string]string, len(c.Labels))
+	for k, v := range c.Labels {
+		out[k] = v
+	}
+	return out
+}

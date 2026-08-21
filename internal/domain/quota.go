@@ -19,7 +19,7 @@ type QuotaLedger struct {
 	items map[string]Quota
 }
 
-func NewQuotaLedger() *QuotaLedger { return &QuotaLedger{} }
+func NewQuotaLedger() *QuotaLedger { return &QuotaLedger{items: map[string]Quota{}} }
 func (q *QuotaLedger) Set(v Quota) error {
 	if v.TenantID == "" || v.MaxBytes < 0 || v.MaxConcurrent < 0 {
 		return fmt.Errorf("%w: invalid quota", ErrInvalidInput)

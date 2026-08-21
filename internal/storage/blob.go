@@ -11,7 +11,25 @@ import (
 
 type LocalBlobStore struct{ root string }
 
-func NewLocalBlobStore(r string) *LocalBlobStore { return &LocalBlobStore{root: ""} }
+// defaultBlobRoot returns a stable, writable directory when no explicit root is
+// configured. UserCacheDir persists across runs; TempDir is the fallback if the
+// cache directory cannot be resolved (e.g. $HOME unset).
+func defaultBlobRoot() string {
+	if d, err := os.UserCacheDir(); err == nil {
+		return filepath.Join(d, "media-workflow", "blobs")
+	}
+	return filepath.Join(os.TempDir(), "media-workflow-blobs")
+}
+
+// NewLocalBlobStore creates a blob store rooted at r. When r is empty the store
+// falls back to a usable default directory so first-run asset creation does not
+// target an empty path. An explicit r is always honored as-is.
+func NewLocalBlobStore(r string) *LocalBlobStore {
+	if r == "" {
+		r = defaultBlobRoot()
+	}
+	return &LocalBlobStore{root: r}
+}
 func (s *LocalBlobStore) Put(_ context.Context, n string, b []byte) (string, error) {
 	sum := sha256.Sum256(b)
 	k := hex.EncodeToString(sum[:])

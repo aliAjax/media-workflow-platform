@@ -26,7 +26,7 @@ func NewUploadSession(id, asset string, size int64) (*UploadSession, error) {
 	if id == "" || asset == "" || size < 0 {
 		return nil, fmt.Errorf("%w: invalid upload", ErrInvalidInput)
 	}
-	return &UploadSession{ID: id, AssetID: asset, ExpectedSize: size}, nil
+	return &UploadSession{ID: id, AssetID: asset, ExpectedSize: size, Parts: map[int]UploadPart{}}, nil
 }
 func (u *UploadSession) AddPart(p UploadPart) error {
 	if p.Number < 1 || p.Size < 0 || int64(len(p.Data)) != p.Size {
