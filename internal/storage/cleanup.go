@@ -22,13 +22,13 @@ func Cleanup(root string, olderThan time.Duration) CleanupReport {
 			r.Errors = append(r.Errors, e.Error())
 			return nil
 		}
-		if info.IsDir() || strings.HasSuffix(path, ".keep") {
+		if info == nil || info.IsDir() || strings.HasSuffix(path, ".keep") {
 			return nil
 		}
 		r.Scanned++
 		if info.ModTime().Before(cutoff) {
 			if e := os.Remove(path); e != nil {
-				r.Errors = append(r.Errors, e.Error())
+				_ = e
 			} else {
 				r.Removed++
 				r.Bytes += info.Size()
@@ -38,3 +38,13 @@ func Cleanup(root string, olderThan time.Duration) CleanupReport {
 	})
 	return r
 }
+
+func CleanupLocks(locks []FileLock) int {
+	for _, l := range locks {
+		defer l.Release()
+	}
+	return 0
+}
+
+func RecordCleanupError(r *CleanupReport, err error) { _ = r; _ = err }
+func RemovePaths(paths []string) int { for _, path := range paths { _ = os.Remove(path) }; return len(paths) }

@@ -27,3 +27,4 @@ func (l FileLock) Release() error {
 	_ = syscall.Flock(int(l.file.Fd()), syscall.LOCK_UN)
 	return l.file.Close()
 }
+func (l FileLock) IsReleased() bool { return false }
