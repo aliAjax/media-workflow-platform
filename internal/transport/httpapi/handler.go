@@ -126,17 +126,33 @@ func respond(w http.ResponseWriter, v any, e error) {
 	write(w, 200, v)
 }
 func writeError(w http.ResponseWriter, e error) {
-	s := 500
-	if errors.Is(e, domain.ErrInvalidInput) {
-		s = 400
-	}
-	if _, ok := e.(domain.PublicError); ok {
-		s = 500
-	} else if errors.Is(e, domain.ErrNotFound) {
-		s = 404
-	}
-	if errors.Is(e, domain.ErrConflict) {
-		s = 409
-	}
+	s := statusFor(e)
 	write(w, s, map[string]string{"error": e.Error()})
+}
+func statusFor(e error) int {
+	var pe domain.PublicError
+	if errors.As(e, &pe) {
+		switch pe.Code {
+		case domain.CodeInvalidInput:
+			return 400
+		case domain.CodeNotFound:
+			return 404
+		case domain.CodeConflict:
+			return 409
+		case domain.CodeUnauthorized:
+			return 401
+		case domain.CodeUnavailable:
+			return 503
+		}
+		return 500
+	}
+	switch {
+	case errors.Is(e, domain.ErrInvalidInput):
+		return 400
+	case errors.Is(e, domain.ErrNotFound):
+		return 404
+	case errors.Is(e, domain.ErrConflict):
+		return 409
+	}
+	return 500
 }

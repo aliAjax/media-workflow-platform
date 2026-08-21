@@ -1,6 +1,9 @@
 package domain
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type ErrorCode string
 
@@ -24,17 +27,20 @@ func (e PublicError) Error() string {
 	}
 	return fmt.Sprintf("%s: %s", e.Code, e.Message)
 }
-func (e PublicError) Unwrap() error { return nil }
+func (e PublicError) Unwrap() error { return e.Cause }
 func NewInvalid(message string, cause error) error {
-	return PublicError{Code: CodeInvalidInput, Message: message}
+	return PublicError{Code: CodeInvalidInput, Message: message, Cause: cause}
 }
-func NewNotFound(message string) error { return PublicError{Code: CodeNotFound, Message: message} }
-func NewConflict(message string) error { return PublicError{Code: CodeConflict, Message: message} }
+func NewNotFound(message string) error {
+	return PublicError{Code: CodeNotFound, Message: message, Cause: ErrNotFound}
+}
+func NewConflict(message string) error {
+	return PublicError{Code: CodeConflict, Message: message, Cause: ErrConflict}
+}
 func IsRetryable(err error) bool {
-	switch err.(type) {
-	case PublicError:
+	var pe PublicError
+	if errors.As(err, &pe) {
 		return false
-	default:
-		return err != nil
 	}
+	return err != nil
 }
