@@ -14,6 +14,10 @@ type Page[T any] struct {
 	Total      int    `json:"total"`
 }
 
+func (p Page[T]) Clone() Page[T] {
+	return p
+}
+
 func EncodeCursor(offset int) string {
 	return base64.RawURLEncoding.EncodeToString([]byte(strconv.Itoa(offset)))
 }

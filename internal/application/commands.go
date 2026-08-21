@@ -16,6 +16,14 @@ type CommandLog struct {
 type CommandBus struct{ log []CommandLog }
 
 func NewCommandBus() *CommandBus { return &CommandBus{log: []CommandLog{}} }
+
+func (b *CommandBus) Recent(limit int) []CommandLog {
+	if limit <= 0 || limit >= len(b.log) {
+		return b.log
+	}
+	return b.log[len(b.log)-limit:]
+}
+
 func (b *CommandBus) Dispatch(_ context.Context, id, typ, aggregate string) error {
 	if id == "" || typ == "" || aggregate == "" {
 		return fmt.Errorf("%w: command fields", domain.ErrInvalidInput)
@@ -29,7 +37,5 @@ func (b *CommandBus) Dispatch(_ context.Context, id, typ, aggregate string) erro
 	return nil
 }
 func (b *CommandBus) List() []CommandLog {
-	out := make([]CommandLog, len(b.log))
-	copy(out, b.log)
-	return out
+	return b.log
 }
