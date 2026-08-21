@@ -36,3 +36,13 @@ func VerifyManifest(m Manifest) error {
 	}
 	return nil
 }
+
+func SelectArtifacts(items []domain.Artifact, kind string) []domain.Artifact {
+	out := items[:0]
+	for _, item := range items {
+		if kind == "" || item.Kind == kind {
+			out = append(out, item)
+		}
+	}
+	return out
+}

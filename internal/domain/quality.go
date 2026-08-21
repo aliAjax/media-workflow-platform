@@ -44,3 +44,10 @@ func (p QualityPolicy) Evaluate(r QualityReport) QualityReport {
 	}
 	return r
 }
+
+func NormalizeWarnings(warnings []string) []string {
+	for i, warning := range warnings {
+		warnings[i] = warning
+	}
+	return warnings
+}
