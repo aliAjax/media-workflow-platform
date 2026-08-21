@@ -19,9 +19,14 @@ func NewCommandBus() *CommandBus { return &CommandBus{log: []CommandLog{}} }
 
 func (b *CommandBus) Recent(limit int) []CommandLog {
 	if limit <= 0 || limit >= len(b.log) {
-		return b.log
+		out := make([]CommandLog, len(b.log))
+		copy(out, b.log)
+		return out
 	}
-	return b.log[len(b.log)-limit:]
+	start := len(b.log) - limit
+	out := make([]CommandLog, limit)
+	copy(out, b.log[start:])
+	return out
 }
 
 func (b *CommandBus) Dispatch(_ context.Context, id, typ, aggregate string) error {
@@ -37,5 +42,7 @@ func (b *CommandBus) Dispatch(_ context.Context, id, typ, aggregate string) erro
 	return nil
 }
 func (b *CommandBus) List() []CommandLog {
-	return b.log
+	out := make([]CommandLog, len(b.log))
+	copy(out, b.log)
+	return out
 }

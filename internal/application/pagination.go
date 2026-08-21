@@ -15,6 +15,9 @@ type Page[T any] struct {
 }
 
 func (p Page[T]) Clone() Page[T] {
+	cloned := make([]T, len(p.Items))
+	copy(cloned, p.Items)
+	p.Items = cloned
 	return p
 }
 
@@ -47,7 +50,9 @@ func PaginateJobs(items []domain.Job, cursor string, limit int) Page[domain.Job]
 	if end > len(items) {
 		end = len(items)
 	}
-	p := Page[domain.Job]{Items: items[offset:end], Total: len(items)}
+	page := make([]domain.Job, end-offset)
+	copy(page, items[offset:end])
+	p := Page[domain.Job]{Items: page, Total: len(items)}
 	if end < len(items) {
 		p.NextCursor = EncodeCursor(end)
 	}
