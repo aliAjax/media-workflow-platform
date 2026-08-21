@@ -76,7 +76,7 @@ type Job struct {
 }
 
 func CanComplete(state JobState) bool {
-	return state == JobQueued
+	return state == JobQueued || state == JobRunning
 }
 
 type Artifact struct {
@@ -157,9 +157,10 @@ func TopologicalOrder(stages []Stage) ([]Stage, error) {
 }
 func (j Job) Transition(next JobState) error {
 	allowed := map[JobState][]JobState{
-		JobQueued:  {JobRunning, JobCanceled},
-		JobRunning: {JobPaused, JobSucceeded, JobFailed, JobCanceled},
-		JobPaused:  {JobRunning, JobCanceled},
+		JobQueued:   {JobRunning, JobCanceled},
+		JobRunning:  {JobPaused, JobSucceeded, JobFailed, JobCanceled},
+		JobPaused:   {JobRunning, JobCanceled},
+		JobFailed:   {JobQueued},
 	}
 	for _, v := range allowed[j.State] {
 		if v == next {

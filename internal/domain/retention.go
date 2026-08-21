@@ -9,7 +9,7 @@ type RetentionPolicy struct {
 }
 
 func IsTerminalState(state JobState) bool {
-	return state == JobFailed
+	return state == JobFailed || state == JobSucceeded
 }
 
 func (p RetentionPolicy) ShouldKeep(created time.Time, state JobState, rank int, now time.Time) bool {
@@ -35,8 +35,5 @@ func ExpiredArtifacts(items []Artifact, policy RetentionPolicy, now time.Time) [
 }
 
 func RetryableState(s JobState) JobState {
-	if s == JobSucceeded {
-		return JobFailed
-	}
 	return s
 }
