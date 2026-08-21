@@ -8,6 +8,14 @@ import (
 
 var allowed = map[string]bool{"probe": true, "transcode": true, "thumbnail": true, "waveform": true, "subtitle": true, "package": true, "quality-check": true}
 
+func ValidateParameter(params map[string]string, key string) error {
+	_, err := ParseInt(params, key, 0)
+	if err != nil {
+		return fmt.Errorf("validate %s: %v", key, err)
+	}
+	return nil
+}
+
 func Validate(p domain.Pipeline) error {
 	if e := p.Validate(); e != nil {
 		return e
