@@ -14,7 +14,7 @@ func ParseInt(params map[string]string, key string, defaultValue int) (int, erro
 	}
 	n, e := strconv.Atoi(v)
 	if e != nil {
-		return 0, fmt.Errorf("%s: %v", domain.ErrInvalidInput, e)
+		return 0, fmt.Errorf("%w: %v", domain.ErrInvalidInput, e)
 	}
 	return n, nil
 }
@@ -25,14 +25,14 @@ func ParseBool(params map[string]string, key string, defaultValue bool) (bool, e
 	}
 	n, e := strconv.ParseBool(v)
 	if e != nil {
-		return false, fmt.Errorf("%s: %v", domain.ErrInvalidInput, e)
+		return false, fmt.Errorf("%w: %v", domain.ErrInvalidInput, e)
 	}
 	return n, nil
 }
 func AllowlistedParams(params map[string]string, allowed map[string]bool) error {
 	for k := range params {
 		if !allowed[k] {
-			return fmt.Errorf("%s: parameter %s not allowed", domain.ErrInvalidInput, k)
+			return fmt.Errorf("%w: parameter %s not allowed", domain.ErrInvalidInput, k)
 		}
 	}
 	return nil

@@ -11,7 +11,7 @@ var allowed = map[string]bool{"probe": true, "transcode": true, "thumbnail": tru
 func ValidateParameter(params map[string]string, key string) error {
 	_, err := ParseInt(params, key, 0)
 	if err != nil {
-		return fmt.Errorf("validate %s: %v", key, err)
+		return fmt.Errorf("validate %s: %w", key, err)
 	}
 	return nil
 }
