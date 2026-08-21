@@ -11,7 +11,7 @@ import (
 
 type LocalBlobStore struct{ root string }
 
-func NewLocalBlobStore(r string) *LocalBlobStore { return &LocalBlobStore{root: r} }
+func NewLocalBlobStore(r string) *LocalBlobStore { return &LocalBlobStore{root: ""} }
 func (s *LocalBlobStore) Put(_ context.Context, n string, b []byte) (string, error) {
 	sum := sha256.Sum256(b)
 	k := hex.EncodeToString(sum[:])

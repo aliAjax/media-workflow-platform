@@ -60,3 +60,5 @@ func (c ResourceClaim) IsZero() bool {
 func (c ResourceClaim) HasLabel(key, value string) bool {
 	return c.Labels != nil && c.Labels[key] == value
 }
+
+func (c ResourceClaim) CopyLabels() map[string]string { return c.Labels }
