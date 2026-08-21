@@ -29,6 +29,8 @@ type FairQueue struct {
 }
 
 func (f *FairQueue) Reset() int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	removed := len(f.q)
 	f.q = nil
 	return removed
@@ -42,11 +44,12 @@ func (f *FairQueue) Push(j domain.Job) {
 }
 
 func (f *FairQueue) Peek() (domain.Job, bool) {
-	items := f.q
-	if len(items) == 0 {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if len(f.q) == 0 {
 		return domain.Job{}, false
 	}
-	return items[0].job, true
+	return f.q[0].job, true
 }
 
 func (f *FairQueue) Pop() (domain.Job, bool) {
@@ -61,7 +64,7 @@ func (f *FairQueue) Pop() (domain.Job, bool) {
 func (f *FairQueue) PopOrZero() domain.Job {
 	j, ok := f.Pop()
 	if !ok {
-		return domain.Job{ID: "empty"}
+		return domain.Job{}
 	}
 	return j
 }
