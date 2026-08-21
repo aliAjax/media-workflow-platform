@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -21,7 +22,9 @@ type Runner struct {
 	queue     chan string
 	workers   int
 	wg        sync.WaitGroup
+	stopOnce  sync.Once
 	stop      chan struct{}
+	stopped   atomic.Bool
 }
 
 func New(j domain.JobRepository, a domain.AssetRepository, p domain.PipelineRepository, ar domain.ArtifactRepository, b domain.BlobStore, l *slog.Logger, w int) *Runner {
@@ -36,8 +39,8 @@ func (r *Runner) Start() {
 		go r.loop(i)
 	}
 }
-func (r *Runner) Stop() { close(r.stop); r.wg.Wait() }
-func (r *Runner) Stopped() bool { return false }
+func (r *Runner) Stop() { r.stopOnce.Do(func() { close(r.stop); r.stopped.Store(true) }); r.wg.Wait() }
+func (r *Runner) Stopped() bool { return r.stopped.Load() }
 func (r *Runner) Enqueue(id string) error {
 	select {
 	case r.queue <- id:
